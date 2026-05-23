@@ -8,4 +8,6 @@ export interface OptimizedImageProps {
   width: number;
   height: number;
   className?: string;
+  placeholder?: string;
+  fallback?: string;
 }
