@@ -1,2 +1,1 @@
-
-export type ImageLoadState = 'idle' | 'loading' | 'loaded' | 'error';
+export type ImageLoadState = "idle" | "loading" | "loaded" | "error";
