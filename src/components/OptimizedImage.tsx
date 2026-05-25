@@ -50,7 +50,6 @@ export default function OptimizedImage({
             imageRendering: "pixelated",
             opacity: isLoaded ? 0 : 1,
           }}
-          loading="lazy"
         />
       )}
 
@@ -66,7 +65,6 @@ export default function OptimizedImage({
           objectFit: "cover",
           opacity: isLoaded ? 1 : 0,
         }}
-        loading="lazy"
       />
     </div>
   );
