@@ -1,30 +1,60 @@
 import useImageLoader from "../hooks/useImageLoader";
-import type { OptimizedImageProps } from "../interfaces";
+import type { ImageWithFormatsProps, OptimizedImageProps } from "../interfaces";
+
+function ImageWithFormats({
+  src,
+  alt,
+  avifSrc,
+  webpSrc,
+  customStyles,
+}: ImageWithFormatsProps) {
+  const sharedStyles = {
+    position: "absolute" as const,
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "cover" as const,
+    ...customStyles,
+  };
+
+  if (avifSrc) {
+    return <img src={avifSrc} alt={alt} style={sharedStyles} />;
+  }
+
+  if (webpSrc) {
+    return <img src={webpSrc} alt={alt} style={sharedStyles} />;
+  }
+
+  return <img src={src} alt={alt} style={sharedStyles} />;
+}
 
 export default function OptimizedImage({
   src,
+  avifSrc,
+  webpSrc,
   alt,
   width,
   height,
   placeholder,
   fallback,
+  avifFallback,
+  webpFallback,
 }: OptimizedImageProps) {
-  const imageState = useImageLoader({ src });
+  const imageState = useImageLoader({ src, avifSrc, webpSrc });
 
-  // If error happens and we have a fallback, show it directly
   if (imageState === "error" && fallback) {
     return (
       <div style={{ width, height, position: "relative" }}>
-        <img
+        <ImageWithFormats
+          avifSrc={avifFallback}
+          webpSrc={webpFallback}
           src={fallback}
           alt={alt}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
       </div>
     );
   }
 
-  // Determine opacities based on our state machine
   const isLoaded = imageState === "loaded";
 
   return (
@@ -38,31 +68,22 @@ export default function OptimizedImage({
     >
       {/* 1. Placeholder Image (Bottom Layer) */}
       {placeholder && (
-        <img
+        <ImageWithFormats
           src={placeholder}
           alt={alt}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            imageRendering: "pixelated",
+          customStyles={{
             opacity: isLoaded ? 0 : 1,
           }}
         />
       )}
 
       {/* 2. Real Full-Quality Image (Top Layer) */}
-      <img
+      <ImageWithFormats
         src={src}
+        avifSrc={avifSrc}
+        webpSrc={webpSrc}
         alt={alt}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
+        customStyles={{
           opacity: isLoaded ? 1 : 0,
         }}
       />
