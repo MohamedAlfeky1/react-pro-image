@@ -29,12 +29,10 @@ import { useState, useEffect } from "react";
 // ---------------------------------------------------------------------------
 // Test assets
 // ---------------------------------------------------------------------------
-// AVIF: We fetch a 1×1 AVIF from Unsplash's CDN to verify the browser can
-// actually decode the AVIF format. A remote URL is used because a minimal
-// valid AVIF file (with the required ftyp + meta + mdat boxes) is too large
-// to inline comfortably as a data-URI.
+// AVIF: We fetch a 1×1 AVIF encoded as a Base64 data-URI to verify the browser can
+// actually decode the AVIF format.
 const AVIF_TEST =
-  "https://images.unsplash.com/photo-1461988320302-91bde64fc8e4?fm=avif&w=1";
+  "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAACEwAAABcAAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQAMAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAAB9tZGF0EgAKBzgAPtPlAIED8GqhABwMDIBAAAAA";
 
 // WebP: A tiny 1×1 WebP encoded as a Base64 data-URI. WebP files are small
 // enough to inline directly, so no network request is needed.

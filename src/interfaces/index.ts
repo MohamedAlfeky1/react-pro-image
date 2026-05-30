@@ -1,12 +1,36 @@
 import type { CSSProperties } from "react";
 
 /**
+ * Configuration for automatic format negotiation via URL query parameters.
+ *
+ * When using `autoSrc`, the component appends `&{formatKey}={format}` to the
+ * URL for each format the browser supports, in the order specified.
+ *
+ * @example
+ * // Unsplash / Imgix CDN
+ * { formatKey: "fm", formats: ["avif", "webp"] }
+ *
+ * // Cloudinary
+ * { formatKey: "f", formats: ["avif", "webp"] }
+ */
+export interface AutoFormatConfig {
+  /** The query parameter key used by the CDN for format selection (e.g. "fm", "f", "format") */
+  formatKey: string;
+  /** Ordered list of modern formats to try, from most preferred to least (e.g. ["avif", "webp"]) */
+  formats: ("avif" | "webp")[];
+}
+
+/**
  * Options configuration for the custom `useImageLoader` hook.
  * Handles the state management of preloading and switching between image formats.
  */
 export interface UseImageLoaderOptions {
   /** The fallback standard image source (JPEG, PNG, etc.) */
-  src: string;
+  src?: string;
+  /** Automatically optimized or generated source URL */
+  autoSrc?: string;
+  /** Format configuration for autoSrc URL parameter building */
+  autoFormat?: AutoFormatConfig;
   /** Optional high-efficiency AVIF source */
   avifSrc?: string;
   /** Optional WebP source */
@@ -45,47 +69,50 @@ interface OptimizedImageBaseProps {
 // ============================================================================
 
 /** Ensure either `src` or `autoSrc` is provided, but never both. */
-type ManualSrc = { 
+type ManualSrc = {
   /** Manual standard image source URL (JPEG, PNG, etc.) */
-  src: string; 
-  autoSrc?: never; 
+  src: string;
+  autoSrc?: never;
+  autoFormat?: never;
 };
-type AutoSrc = { 
+type AutoSrc = {
   /** Automatically optimized or generated source URL */
-  autoSrc: string; 
-  src?: never; 
+  autoSrc: string;
+  /** Configuration for format query parameter (required with autoSrc) */
+  autoFormat: AutoFormatConfig;
+  src?: never;
 };
 
 /** Ensure at most one of `placeholder` or `autoPlaceholder` is provided. */
-type ManualPlaceholder = { 
+type ManualPlaceholder = {
   /** Manual low-res or layout placeholder image URL (e.g. Base64 or tiny thumbnail) */
-  placeholder: string; 
-  autoPlaceholder?: never; 
+  placeholder: string;
+  autoPlaceholder?: never;
 };
-type AutoPlaceholder = { 
+type AutoPlaceholder = {
   /** Automatically generated low-res placeholder image URL */
-  autoPlaceholder: string; 
-  placeholder?: never; 
+  autoPlaceholder: string;
+  placeholder?: never;
 };
-type NoPlaceholder = { 
-  placeholder?: never; 
-  autoPlaceholder?: never; 
+type NoPlaceholder = {
+  placeholder?: never;
+  autoPlaceholder?: never;
 };
 
 /** Ensure at most one of `fallback` or `autoFallback` is provided. */
-type ManualFallback = { 
+type ManualFallback = {
   /** Manual fallback image URL shown if the primary image fails to load */
-  fallback: string; 
-  autoFallback?: never; 
+  fallback: string;
+  autoFallback?: never;
 };
-type AutoFallback = { 
+type AutoFallback = {
   /** Automatically generated fallback image URL shown if the primary image fails to load */
-  autoFallback: string; 
-  fallback?: never; 
+  autoFallback: string;
+  fallback?: never;
 };
-type NoFallback = { 
-  fallback?: never; 
-  autoFallback?: never; 
+type NoFallback = {
+  fallback?: never;
+  autoFallback?: never;
 };
 
 /**
@@ -106,7 +133,11 @@ export type OptimizedImageProps = OptimizedImageBaseProps &
  */
 export interface ImageWithFormatsProps {
   /** The final resolved fallback standard image source URL */
-  src: string;
+  src?: string;
+  /** Automatically optimized source URL */
+  autoSrc?: string;
+  /** Format configuration for autoSrc URL parameter building */
+  autoFormat?: AutoFormatConfig;
   /** Alternative text for accessibility */
   alt: string;
   /** AVIF source URL, if available */
@@ -116,4 +147,3 @@ export interface ImageWithFormatsProps {
   /** Inline styles used for transitions and layout positioning */
   customStyles?: CSSProperties;
 }
-
