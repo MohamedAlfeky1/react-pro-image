@@ -1,11 +1,12 @@
+import { useImageFormatSupport } from "../hooks/useImageFormatSupport";
 import useImageLoader from "../hooks/useImageLoader";
 import type { ImageWithFormatsProps, OptimizedImageProps } from "../interfaces";
 
 function ImageWithFormats({
   src,
-  alt,
   avifSrc,
   webpSrc,
+  alt,
   customStyles,
 }: ImageWithFormatsProps) {
   const sharedStyles = {
@@ -17,11 +18,13 @@ function ImageWithFormats({
     ...customStyles,
   };
 
-  if (avifSrc) {
+  const { avif, webp, ready } = useImageFormatSupport();
+
+  if (avifSrc && ready && avif) {
     return <img src={avifSrc} alt={alt} style={sharedStyles} />;
   }
 
-  if (webpSrc) {
+  if (webpSrc && ready && webp) {
     return <img src={webpSrc} alt={alt} style={sharedStyles} />;
   }
 
@@ -30,13 +33,16 @@ function ImageWithFormats({
 
 export default function OptimizedImage({
   src,
+  autoSrc,
   avifSrc,
   webpSrc,
   alt,
   width,
   height,
   placeholder,
+  autoPlaceholder,
   fallback,
+  autoFallback,
   avifFallback,
   webpFallback,
 }: OptimizedImageProps) {
