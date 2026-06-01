@@ -3,19 +3,39 @@ import type { UseImageLoaderOptions } from "../interfaces";
 import type { ImageLoadState } from "../types";
 import { useImageFormatSupport } from "./useImageFormatSupport";
 
+/**
+ * Preloads an image off-screen and exposes its load state.
+ *
+ * Loading is deferred until `isInView` is `true`, enabling lazy-load
+ * behaviour when combined with an intersection observer. The hook
+ * selects the best available format in priority order: AVIF → WebP → original.
+ *
+ * @param options.src      - Original image URL (required fallback).
+ * @param options.avifSrc  - Optional AVIF source (highest priority).
+ * @param options.webpSrc  - Optional WebP source (second priority).
+ * @param options.isInView - When `true`, triggers the preload. Pass `true`
+ *                           directly to disable lazy behaviour (default `false`).
+ * @returns Current load state: `"idle"` | `"loading"` | `"loaded"` | `"error"`.
+ *
+ * @example
+ * ```tsx
+ * const state = useImageLoader({ src, isInView: true });
+ * // state: "idle" → "loading" → "loaded" | "error"
+ * ```
+ */
 export default function useImageLoader({
   src,
   autoSrc,
   autoFormat,
   avifSrc,
   webpSrc,
+  isInView = false,
 }: UseImageLoaderOptions) {
   const { avif, webp, ready } = useImageFormatSupport();
   const [imageState, setImageState] = useState<ImageLoadState>("idle");
 
-  // Preload the active source and track its load state
   useEffect(() => {
-    if (!ready) return;
+    if (!isInView || !ready) return;
 
     let activeSrc: string | undefined;
 
@@ -57,12 +77,11 @@ export default function useImageLoader({
     img.onerror = () => setImageState("error");
     img.src = activeSrc;
 
-    // Cleanup listeners on unmount or src change
     return () => {
       img.onload = null;
       img.onerror = null;
     };
-  }, [src, autoSrc, autoFormat, avifSrc, webpSrc, avif, webp, ready]);
+  }, [src, autoSrc, autoFormat, avifSrc, webpSrc, avif, webp, ready, isInView]);
 
   return imageState;
 }

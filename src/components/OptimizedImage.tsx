@@ -1,5 +1,6 @@
 import { useImageFormatSupport } from "../hooks/useImageFormatSupport";
 import useImageLoader from "../hooks/useImageLoader";
+import useInView from "../hooks/useInView";
 import type { ImageWithFormatsProps, OptimizedImageProps } from "../interfaces";
 
 /**
@@ -22,6 +23,12 @@ function ImageWithFormats({
   alt,
   customStyles,
 }: ImageWithFormatsProps) {
+  /**
+   * Base styles that position the image as an absolutely-placed cover layer.
+   * The `transition` enables a smooth opacity crossfade between the
+   * placeholder and the fully-loaded image.
+   * Any `customStyles` (e.g. dynamic opacity) are spread on top.
+   */
   const sharedStyles = {
     position: "absolute" as const,
     inset: 0,
@@ -74,6 +81,32 @@ function ImageWithFormats({
   return <img src={src} alt={alt} style={sharedStyles} />;
 }
 
+/**
+ * A performance-focused image component that combines **lazy loading**,
+ * **placeholder-to-full crossfade**, and **modern format selection**
+ * (AVIF / WebP) into a single drop-in `<img>` replacement.
+ *
+ * ## How it works
+ *
+ * 1. **Visibility detection** — An `IntersectionObserver` (via `useInView`)
+ *    watches the container element. No network request is made until the
+ *    configured `threshold` of the element is visible in the viewport.
+ *
+ * 2. **Off-screen preload** — Once visible, `useImageLoader` creates a
+ *    hidden `Image()` object to download the best-available format
+ *    (AVIF → WebP → original). The component tracks the load state
+ *    (`idle` → `loading` → `loaded` | `error`).
+ *
+ * 3. **Crossfade transition** — The placeholder and real image are rendered
+ *    as stacked layers. When the real image finishes loading, the
+ *    placeholder's opacity is animated to `0`, revealing the full image.
+ *
+ * 4. **Error recovery** — If loading fails and a `fallback` src is provided,
+ *    the fallback image is rendered instead.
+ *
+ * @see {@link useInView}       — viewport detection hook
+ * @see {@link useImageLoader}  — off-screen preloading hook
+ */
 export default function OptimizedImage({
   src,
   autoSrc,
@@ -89,18 +122,31 @@ export default function OptimizedImage({
   autoFallback,
   avifFallback,
   webpFallback,
+  lazy = true,
+  threshold = 0.25,
+  rootMargin = "0px",
 }: OptimizedImageProps) {
+  // Attach `ref` to the wrapper so the IntersectionObserver can track it.
+  // `isInView` flips to `true` once the element meets the visibility threshold
+  // and stays `true` permanently (one-shot observation).
+  const { ref, isInView } = useInView({ threshold, rootMargin });
+
+  // Start downloading the real image only after the element enters the viewport.
+  // When `lazy` is disabled, we pass `true` directly to load immediately.
   const imageState = useImageLoader({
     src,
     autoSrc,
     autoFormat,
     avifSrc,
     webpSrc,
+    isInView: lazy ? isInView : true,
   });
 
+  // If the image failed to load and the consumer provided a fallback,
+  // render the fallback image (with optional AVIF/WebP variants) and bail out.
   if (imageState === "error" && (fallback || autoFallback)) {
     return (
-      <div style={{ width, height, position: "relative" }}>
+      <div ref={ref} style={{ width, height, position: "relative" }}>
         <ImageWithFormats
           avifSrc={avifFallback}
           webpSrc={webpFallback}
@@ -115,8 +161,12 @@ export default function OptimizedImage({
 
   const isLoaded = imageState === "loaded";
 
+  // The container uses `position: relative` + `overflow: hidden` to create
+  // a stacking context. Both the placeholder and the real image are positioned
+  // absolutely so they overlap — only their opacity differs.
   return (
     <div
+      ref={ref}
       style={{
         width,
         height,
@@ -124,8 +174,8 @@ export default function OptimizedImage({
         overflow: "hidden",
       }}
     >
-      {/* 1. Placeholder Image (Bottom Layer) */}
-      {(placeholder || autoPlaceholder) && (
+      {/* Placeholder layer (bottom) — visible immediately, fades out once loaded */}
+      {placeholder && (
         <ImageWithFormats
           src={placeholder}
           autoSrc={autoPlaceholder}
@@ -137,18 +187,17 @@ export default function OptimizedImage({
         />
       )}
 
-      {/* 2. Real Full-Quality Image (Top Layer) */}
-      <ImageWithFormats
-        src={src}
-        autoSrc={autoSrc}
-        autoFormat={autoFormat}
-        avifSrc={avifSrc}
-        webpSrc={webpSrc}
-        alt={alt}
-        customStyles={{
-          opacity: isLoaded ? 1 : 0,
-        }}
-      />
+      {/* Real image layer (top) — mounted only after the element enters the viewport */}
+      {(lazy ? isInView : true) && (
+        <ImageWithFormats
+          src={src}
+          autoSrc={autoSrc}
+          autoFormat={autoFormat}
+          avifSrc={avifSrc}
+          webpSrc={webpSrc}
+          alt={alt}
+        />
+      )}
     </div>
   );
 }

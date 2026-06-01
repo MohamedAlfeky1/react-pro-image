@@ -35,6 +35,8 @@ export interface UseImageLoaderOptions {
   avifSrc?: string;
   /** Optional WebP source */
   webpSrc?: string;
+  /** When true, the hook starts preloading the image. Default: false */
+  isInView?: boolean;
 }
 
 /**
@@ -58,6 +60,12 @@ interface OptimizedImageBaseProps {
   avifFallback?: string;
   /** Optional WebP override specifically for the error fallback image */
   webpFallback?: string;
+  /** Enable lazy loading with IntersectionObserver. Default: true */
+  lazy?: boolean;
+  /** How much of the image must be visible before loading (0 to 1). Default: 0.25 */
+  threshold?: number;
+  /** Extra margin to start loading before element is visible. Default: "0px" */
+  rootMargin?: string;
 }
 
 // ============================================================================
@@ -146,4 +154,11 @@ export interface ImageWithFormatsProps {
   webpSrc?: string;
   /** Inline styles used for transitions and layout positioning */
   customStyles?: CSSProperties;
+}
+
+export interface UseInViewOptions {
+  /** Percentage of the element that must be visible to trigger (0–1). Default: `0.25` */
+  threshold?: number;
+  /** Margin around the root used to expand/shrink the observation area. Default: `"0px"` */
+  rootMargin?: string;
 }
