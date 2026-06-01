@@ -125,6 +125,7 @@ export default function OptimizedImage({
   lazy = true,
   threshold = 0.25,
   rootMargin = "0px",
+  ...rest
 }: OptimizedImageProps) {
   // Attach `ref` to the wrapper so the IntersectionObserver can track it.
   // `isInView` flips to `true` once the element meets the visibility threshold
@@ -173,6 +174,7 @@ export default function OptimizedImage({
         position: "relative",
         overflow: "hidden",
       }}
+      {...rest}
     >
       {/* Placeholder layer (bottom) — visible immediately, fades out once loaded */}
       {placeholder && (

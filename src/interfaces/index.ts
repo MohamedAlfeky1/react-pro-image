@@ -43,17 +43,17 @@ export interface UseImageLoaderOptions {
  * Base properties shared by all configurations of the OptimizedImage component.
  * Contains standard image properties and format-specific overrides.
  */
-interface OptimizedImageBaseProps {
+interface OptimizedImageBaseProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Optional high-efficiency AVIF image source */
   avifSrc?: string;
   /** Optional WebP image source */
   webpSrc?: string;
   /** Accessible alternative text description for the image */
-  alt: string;
+  alt?: string;
   /** Visual display width of the image (in pixels) */
-  width: number;
+  width?: number;
   /** Visual display height of the image (in pixels) */
-  height: number;
+  height?: number;
   /** Optional CSS class names for styling the outer container */
   className?: string;
   /** Optional AVIF override specifically for the error fallback image */
