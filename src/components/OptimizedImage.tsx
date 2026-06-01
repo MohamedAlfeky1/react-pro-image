@@ -122,19 +122,10 @@ export default function OptimizedImage({
   autoFallback,
   avifFallback,
   webpFallback,
-<<<<<<< Updated upstream
-  lazy = true,
-  threshold = 0.25,
-  rootMargin = "0px",
-=======
-<<<<<<< Updated upstream
-=======
   lazy = true,
   threshold = 0.25,
   rootMargin = "0px",
   ...rest
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 }: OptimizedImageProps) {
   // Attach `ref` to the wrapper so the IntersectionObserver can track it.
   // `isInView` flips to `true` once the element meets the visibility threshold
