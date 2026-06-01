@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { UseImageLoaderOptions } from "../interfaces";
 import type { ImageLoadState } from "../types";
+import { useImageFormatSupport } from "./useImageFormatSupport";
 
 /**
  * Preloads an image off-screen and exposes its load state.
@@ -24,19 +25,52 @@ import type { ImageLoadState } from "../types";
  */
 export default function useImageLoader({
   src,
+  autoSrc,
+  autoFormat,
   avifSrc,
   webpSrc,
   isInView = false,
 }: UseImageLoaderOptions) {
-  // Resolve source by format priority: AVIF > WebP > original
-  const activeSrc = avifSrc ?? webpSrc ?? src;
-
+  const { avif, webp, ready } = useImageFormatSupport();
   const [imageState, setImageState] = useState<ImageLoadState>("idle");
 
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || !ready) return;
 
-    setImageState("loading");
+    let activeSrc: string | undefined;
+
+    if (autoSrc && autoFormat) {
+      // Pick the best format: always prefer avif over webp (best quality first)
+      // The formats array controls which formats are allowed, not the priority
+      let bestFormat: string | undefined;
+
+      if (avif && autoFormat.formats.includes("avif")) {
+        bestFormat = "avif";
+      } else if (webp && autoFormat.formats.includes("webp")) {
+        bestFormat = "webp";
+      }
+
+      if (bestFormat) {
+        const separator = autoSrc.includes("?") ? "&" : "?";
+        activeSrc = `${autoSrc}${separator}${autoFormat.formatKey}=${bestFormat}`;
+      } else {
+        activeSrc = autoSrc;
+      }
+    } else {
+      // --- Manual path: use explicit avifSrc / webpSrc ----------------------
+      if (avif && avifSrc) {
+        activeSrc = avifSrc;
+      } else if (webp && webpSrc) {
+        activeSrc = webpSrc;
+      } else {
+        activeSrc = src;
+      }
+    }
+
+    if (!activeSrc) {
+      setImageState("error");
+      return;
+    }
 
     const img = new Image();
     img.onload = () => setImageState("loaded");
@@ -47,7 +81,7 @@ export default function useImageLoader({
       img.onload = null;
       img.onerror = null;
     };
-  }, [activeSrc, isInView]);
+  }, [src, autoSrc, autoFormat, avifSrc, webpSrc, avif, webp, ready, isInView]);
 
   return imageState;
 }
