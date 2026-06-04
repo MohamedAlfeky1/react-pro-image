@@ -1,0 +1,87 @@
+import { useEffect, useState } from "react";
+import type { UseImageLoaderOptions } from "../interfaces";
+import type { ImageLoadState } from "../types";
+import { useImageFormatSupport } from "./useImageFormatSupport";
+
+/**
+ * Preloads an image off-screen and exposes its load state.
+ *
+ * Loading is deferred until `isInView` is `true`, enabling lazy-load
+ * behaviour when combined with an intersection observer. The hook
+ * selects the best available format in priority order: AVIF → WebP → original.
+ *
+ * @param options.src      - Original image URL (required fallback).
+ * @param options.avifSrc  - Optional AVIF source (highest priority).
+ * @param options.webpSrc  - Optional WebP source (second priority).
+ * @param options.isInView - When `true`, triggers the preload. Pass `true`
+ *                           directly to disable lazy behaviour (default `false`).
+ * @returns Current load state: `"idle"` | `"loading"` | `"loaded"` | `"error"`.
+ *
+ * @example
+ * ```tsx
+ * const state = useImageLoader({ src, isInView: true });
+ * // state: "idle" → "loading" → "loaded" | "error"
+ * ```
+ */
+export default function useImageLoader({
+  src,
+  autoSrc,
+  autoFormat,
+  avifSrc,
+  webpSrc,
+  isInView = false,
+}: UseImageLoaderOptions) {
+  const { avif, webp, ready } = useImageFormatSupport();
+  const [imageState, setImageState] = useState<ImageLoadState>("idle");
+
+  useEffect(() => {
+    if (!isInView || !ready) return;
+
+    let activeSrc: string | undefined;
+
+    if (autoSrc && autoFormat) {
+      // Pick the best format: always prefer avif over webp (best quality first)
+      // The formats array controls which formats are allowed, not the priority
+      let bestFormat: string | undefined;
+
+      if (avif && autoFormat.formats.includes("avif")) {
+        bestFormat = "avif";
+      } else if (webp && autoFormat.formats.includes("webp")) {
+        bestFormat = "webp";
+      }
+
+      if (bestFormat) {
+        const separator = autoSrc.includes("?") ? "&" : "?";
+        activeSrc = `${autoSrc}${separator}${autoFormat.formatKey}=${bestFormat}`;
+      } else {
+        activeSrc = autoSrc;
+      }
+    } else {
+      // --- Manual path: use explicit avifSrc / webpSrc ----------------------
+      if (avif && avifSrc) {
+        activeSrc = avifSrc;
+      } else if (webp && webpSrc) {
+        activeSrc = webpSrc;
+      } else {
+        activeSrc = src;
+      }
+    }
+
+    if (!activeSrc) {
+      setImageState("error");
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => setImageState("loaded");
+    img.onerror = () => setImageState("error");
+    img.src = activeSrc;
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [src, autoSrc, autoFormat, avifSrc, webpSrc, avif, webp, ready, isInView]);
+
+  return imageState;
+}

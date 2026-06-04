@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "declarationDir": "./dist",
+    "emitDeclarationOnly": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "erasableSyntaxOnly": true
+  },
+  "include": ["src"],
+  "exclude": ["src/__tests__", "src/App.tsx", "src/main.tsx"]
+}
