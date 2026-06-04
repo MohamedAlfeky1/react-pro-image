@@ -177,7 +177,7 @@ export default function OptimizedImage({
       {...rest}
     >
       {/* Placeholder layer (bottom) — visible immediately, fades out once loaded */}
-      {placeholder && (
+      {(placeholder || autoPlaceholder) && (
         <ImageWithFormats
           src={placeholder}
           autoSrc={autoPlaceholder}

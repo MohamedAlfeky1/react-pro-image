@@ -57,10 +57,10 @@ import { OptimizedImage } from "react-pro-image";
 function Hero() {
   return (
     <OptimizedImage
-      autoSrc="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800"
+      autoSrc="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"
       autoFormat={{ formatKey: "fm", formats: ["avif", "webp"] }}
-      autoPlaceholder="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=20&blur=10"
-      alt="Mountain landscape"
+      autoPlaceholder="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=20&blur=10"
+      alt="Sunlit mountain valley with golden light"
       width={800}
       height={400}
     />
@@ -70,13 +70,13 @@ function Hero() {
 
 ### 💡 What do these props mean?
 
-| Prop | Simple Explanation |
-| --- | --- |
-| `autoSrc` | The main link to your image on the CDN. The component will automatically add the format parameter to the end of this link. |
-| `autoFormat` | Tells the component how your CDN expects the format request. For example, Unsplash uses `fm` (so it becomes `&fm=avif`). We also tell it to try `"avif"` first, then `"webp"`. |
-| `autoPlaceholder` | A link to a very tiny, blurry version of the same image. This loads instantly and looks nice while the user waits for the big image to download. It smoothly fades out when the real image is ready. |
-| `alt` | Text that describes the image. Important for accessibility (screen readers) and SEO. |
-| `width` / `height` | The size of the image container in pixels. |
+| Prop               | Simple Explanation                                                                                                                                                                                   |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `autoSrc`          | The main link to your image on the CDN. The component will automatically add the format parameter to the end of this link.                                                                           |
+| `autoFormat`       | Tells the component how your CDN expects the format request. For example, Unsplash uses `fm` (so it becomes `&fm=avif`). We also tell it to try `"avif"` first, then `"webp"`.                       |
+| `autoPlaceholder`  | A link to a very tiny, blurry version of the same image. This loads instantly and looks nice while the user waits for the big image to download. It smoothly fades out when the real image is ready. |
+| `alt`              | Text that describes the image. Important for accessibility (screen readers) and SEO.                                                                                                                 |
+| `width` / `height` | The size of the image container in pixels.                                                                                                                                                           |
 
 ---
 
@@ -102,11 +102,12 @@ The component will automatically check the browser's capabilities and pick the b
 ```
 
 **How the component chooses the best image:**
+
 1. Does the browser support **AVIF** and did you provide `avifSrc`? -> It uses **AVIF**.
 2. Does the browser support **WebP** and did you provide `webpSrc`? -> It uses **WebP**.
 3. Otherwise? -> It falls back to the standard `src` (JPEG/PNG).
 
-*(You only need to provide the formats you have — `avifSrc` and `webpSrc` are completely optional).*
+_(You only need to provide the formats you have — `avifSrc` and `webpSrc` are completely optional)._
 
 ---
 
@@ -130,7 +131,7 @@ However, for images at the very top of your page (like a hero image), you want t
 
 ### 3. Adjusting the Viewport Trigger (When to start loading)
 
-You can control exactly *when* the lazy loading starts using `threshold` and `rootMargin`:
+You can control exactly _when_ the lazy loading starts using `threshold` and `rootMargin`:
 
 ```tsx
 <OptimizedImage

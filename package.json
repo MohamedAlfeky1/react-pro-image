@@ -1,6 +1,6 @@
 {
   "name": "react-pro-image",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "One single <OptimizedImage /> component, a few props, and you get lazy loading, AVIF/WebP auto-format, placeholder crossfade, and error fallback — out of the box.",
   "author": "MohamedAlfeky1",
