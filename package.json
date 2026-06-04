@@ -1,17 +1,17 @@
 {
-  "name": "react-image-pro",
+  "name": "react-pro-image",
   "version": "1.0.0",
   "type": "module",
-  "description": "A performance-focused React image component with lazy loading, AVIF/WebP format negotiation, placeholder-to-full crossfade, and error fallback — all in a single drop-in <img> replacement.",
+  "description": "One single <OptimizedImage /> component, a few props, and you get lazy loading, AVIF/WebP auto-format, placeholder crossfade, and error fallback — out of the box.",
   "author": "MohamedAlfeky1",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MohamedAlfeky1/react-image-pro.git"
+    "url": "https://github.com/MohamedAlfeky1/react-pro-image.git"
   },
-  "homepage": "https://github.com/MohamedAlfeky1/react-image-pro",
+  "homepage": "https://github.com/MohamedAlfeky1/react-pro-image",
   "bugs": {
-    "url": "https://github.com/MohamedAlfeky1/react-image-pro/issues"
+    "url": "https://github.com/MohamedAlfeky1/react-pro-image/issues"
   },
   "keywords": [
     "react",
@@ -25,18 +25,18 @@
     "crossfade",
     "performance"
   ],
-  "main": "./dist/react-image-pro.cjs.js",
-  "module": "./dist/react-image-pro.es.js",
+  "main": "./dist/react-pro-image.cjs.js",
+  "module": "./dist/react-pro-image.es.js",
   "types": "./dist/src/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/src/index.d.ts",
-        "default": "./dist/react-image-pro.es.js"
+        "default": "./dist/react-pro-image.es.js"
       },
       "require": {
         "types": "./dist/src/index.d.ts",
-        "default": "./dist/react-image-pro.cjs.js"
+        "default": "./dist/react-pro-image.cjs.js"
       }
     }
   },

@@ -16,9 +16,9 @@ export default defineConfig({
     copyPublicDir: false,
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "ReactImagePro",
+      name: "ReactProImage",
       formats: ["es", "cjs"],
-      fileName: (format) => `react-image-pro.${format}.js`,
+      fileName: (format) => `react-pro-image.${format}.js`,
     },
     rollupOptions: {
       // Don't bundle React — consumers provide their own
