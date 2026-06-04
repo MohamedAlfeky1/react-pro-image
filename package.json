@@ -1,17 +1,67 @@
 {
-  "name": "opz",
-  "private": true,
-  "version": "0.0.0",
+  "name": "react-image-pro",
+  "version": "1.0.0",
   "type": "module",
+  "description": "A performance-focused React image component with lazy loading, AVIF/WebP format negotiation, placeholder-to-full crossfade, and error fallback — all in a single drop-in <img> replacement.",
+  "author": "MohamedAlfeky1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MohamedAlfeky1/react-image-pro.git"
+  },
+  "homepage": "https://github.com/MohamedAlfeky1/react-image-pro",
+  "bugs": {
+    "url": "https://github.com/MohamedAlfeky1/react-image-pro/issues"
+  },
+  "keywords": [
+    "react",
+    "image",
+    "lazy-loading",
+    "intersection-observer",
+    "avif",
+    "webp",
+    "optimized",
+    "placeholder",
+    "crossfade",
+    "performance"
+  ],
+  "main": "./dist/react-image-pro.cjs.js",
+  "module": "./dist/react-image-pro.es.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/src/index.d.ts",
+        "default": "./dist/react-image-pro.es.js"
+      },
+      "require": {
+        "types": "./dist/src/index.d.ts",
+        "default": "./dist/react-image-pro.cjs.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "build:types": "tsc -p tsconfig.build.json",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build"
   },
-  "dependencies": {
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -23,8 +73,11 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vite-plugin-dts": "^4.5.4"
   }
 }

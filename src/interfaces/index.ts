@@ -147,7 +147,7 @@ export interface ImageWithFormatsProps {
   /** Format configuration for autoSrc URL parameter building */
   autoFormat?: AutoFormatConfig;
   /** Alternative text for accessibility */
-  alt: string;
+  alt?: string;
   /** AVIF source URL, if available */
   avifSrc?: string;
   /** WebP source URL, if available */
