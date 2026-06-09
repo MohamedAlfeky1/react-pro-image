@@ -125,8 +125,36 @@ export default function OptimizedImage({
   lazy = true,
   threshold = 0.25,
   rootMargin = "0px",
+  style,
   ...rest
 }: OptimizedImageProps) {
+  if (src && autoSrc) {
+    throw new Error(
+      `Conflicting props: You cannot provide both 'src' and 'autoSrc'. For more info, see: https://github.com/MohamedAlfeky1/react-pro-image`,
+    );
+  }
+
+  if (fallback && autoFallback) {
+    throw new Error(
+      `Conflicting props: You cannot provide both 'fallback' and 'autoFallback'. For more info, see: https://github.com/MohamedAlfeky1/react-pro-image`,
+    );
+  }
+
+  if (placeholder && autoPlaceholder) {
+    throw new Error(
+      `Conflicting props: You cannot provide both 'placeholder' and 'autoPlaceholder'. For more info, see: https://github.com/MohamedAlfeky1/react-pro-image`,
+    );
+  }
+
+  const hasWidth = width !== undefined || style?.width !== undefined;
+  const hasHeight = height !== undefined || style?.height !== undefined;
+
+  if (!hasWidth || !hasHeight) {
+    throw new Error(
+      `Missing dimensions: You must provide both 'width' and 'height' (as props or in style) to prevent layout collapse.`,
+    );
+  }
+
   // Attach `ref` to the wrapper so the IntersectionObserver can track it.
   // `isInView` flips to `true` once the element meets the visibility threshold
   // and stays `true` permanently (one-shot observation).
@@ -147,7 +175,16 @@ export default function OptimizedImage({
   // render the fallback image (with optional AVIF/WebP variants) and bail out.
   if (imageState === "error" && (fallback || autoFallback)) {
     return (
-      <div ref={ref} style={{ width, height, position: "relative" }}>
+      <div
+        ref={ref}
+        style={{
+          width,
+          height,
+          position: "relative",
+          ...style,
+        }}
+        {...rest}
+      >
         <ImageWithFormats
           avifSrc={avifFallback}
           webpSrc={webpFallback}
@@ -173,6 +210,7 @@ export default function OptimizedImage({
         height,
         position: "relative",
         overflow: "hidden",
+        ...style,
       }}
       {...rest}
     >
