@@ -27,3 +27,7 @@ dist-ssr
 # Local playground / development testing
 src/App.tsx
 src/assets/*
+
+# Documentation site build output
+docs/.docusaurus
+docs/build

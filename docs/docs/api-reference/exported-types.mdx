@@ -1,0 +1,32 @@
+---
+id: exported-types
+title: Exported Types
+sidebar_label: Exported Types
+sidebar_position: 5
+---
+
+# Exported Types
+
+`react-pro-image` is written in TypeScript and exports all of its public types. You can import these types directly to annotate your own components, utility functions, or wrapper abstractions.
+
+```ts
+import type {
+  OptimizedImageProps,
+  AutoFormatConfig,
+  ImageWithFormatsProps,
+  UseImageLoaderOptions,
+  UseInViewOptions,
+  ImageLoadState,
+} from "react-pro-image";
+```
+
+## Type Reference
+
+| Type | Description |
+| --- | --- |
+| `OptimizedImageProps` | The complete prop type for the `OptimizedImage` component. Extends `HTMLDivElement` attributes with source, placeholder, fallback, and behavior props. |
+| `AutoFormatConfig` | Configuration object for CDN format negotiation. Contains the `formatKey` and an ordered `formats` array. See [AutoFormatConfig](/api-reference/auto-format-config). |
+| `ImageWithFormatsProps` | Props for the internal format-resolving image renderer. Useful if you are building a custom image component on top of the format detection logic. |
+| `UseImageLoaderOptions` | Options accepted by the `useImageLoader` hook, including source URLs, format config, and the `isInView` trigger flag. |
+| `UseInViewOptions` | Options accepted by the `useInView` hook, including `threshold` and `rootMargin` for `IntersectionObserver` configuration. |
+| `ImageLoadState` | A string union type representing the four possible loading states: `"idle"`, `"loading"`, `"loaded"`, or `"error"`. |

@@ -1,0 +1,93 @@
+---
+id: cdn-images
+title: CDN Images
+sidebar_label: CDN Images
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# CDN Images
+
+Using CDN-hosted images? Let the component handle format negotiation automatically. Pass in a base URL and tell it how your CDN accepts format parameters, it does the rest.
+
+No need to pre-generate AVIF or WebP files. No conditional logic in your code. The component detects browser support at runtime and appends the right format query to the URL.
+
+## Full Example
+
+```tsx
+import { OptimizedImage } from "react-pro-image";
+
+function Hero() {
+  return (
+    <OptimizedImage
+      autoSrc="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"
+      autoFormat={{ formatKey: "fm", formats: ["avif", "webp"] }}
+      autoPlaceholder="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=20&blur=10"
+      autoFallback="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"
+      alt="Sunlit mountain valley with golden light"
+      width={800}
+      height={400}
+    />
+  );
+}
+```
+
+---
+
+## Props
+
+**`autoSrc`**
+The base URL of your CDN image. The component appends a format query parameter automatically based on what the browser supports. For example, if the browser supports AVIF, it becomes `?fm=avif`. Required when using auto mode.
+
+**`autoFormat`**
+An object that configures format negotiation. It has two fields:
+
+- `formatKey`: the query parameter name your CDN uses for format selection (e.g. `"f"` for Cloudinary, `"fm"` for Contentful)
+- `formats`: an ordered array of formats to try, from most preferred to least (e.g. `["avif", "webp"]`)
+
+Required whenever you use `autoSrc`.
+
+**`autoPlaceholder`**
+A CDN URL for a tiny preview image shown while the full image loads. Typically the same base URL with a very small width and blur applied. Fades out automatically once the full image is ready.
+
+**`autoFallback`**
+A CDN base URL used if the primary image fails to load. The component appends the format parameter the same way it does for `autoSrc`. Prevents a broken image icon from ever appearing.
+
+**`alt`**
+A text description of the image for screen readers and search engines. Always provide a meaningful value.
+
+**`width` / `height`**
+The dimensions of the image container in pixels. Setting these reserves space in the layout and prevents content shift while the image loads.
+
+---
+
+## CDN Format Keys
+
+Different CDNs use different query parameter names. Here are the most common ones:
+
+<Tabs>
+  <TabItem value="cloudinary" label="Cloudinary" default>
+    ```tsx
+    autoFormat={{ formatKey: "f", formats: ["avif", "webp"] }}
+    // Produces: ?f=avif
+    ```
+  </TabItem>
+  <TabItem value="contentful" label="Contentful">
+    ```tsx
+    autoFormat={{ formatKey: "fm", formats: ["avif", "webp"] }}
+    // Produces: ?fm=avif
+    ```
+  </TabItem>
+  <TabItem value="custom" label="Custom API">
+    ```tsx
+    autoFormat={{ formatKey: "format", formats: ["avif", "webp"] }}
+    // Produces: ?format=avif
+    ```
+  </TabItem>
+</Tabs>
+
+:::info
+Format detection results are cached in localStorage after the first visit, so the browser probe runs only once per user.
+:::

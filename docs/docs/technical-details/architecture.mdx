@@ -1,0 +1,64 @@
+---
+id: architecture
+title: Architecture
+sidebar_label: Architecture
+sidebar_position: 2
+---
+
+# Architecture
+
+`<OptimizedImage />` is built around three hooks that run in sequence. Each one handles a single job, and together they form a pipeline that goes from "component mounted" to "best image rendered" with no wasted work.
+
+## The Internal Pipeline
+
+![How OptimizedImage processes an image request, from viewport detection through format negotiation to the final render](/img/internal-pipeline.png)
+
+## How It Works
+
+### 1. Viewport Detection
+
+When the component mounts, it does nothing. No network requests, no format checks, just an `IntersectionObserver` quietly watching the container.
+
+The moment the image scrolls into view (by default, when 25% of it is visible), the observer fires once, sets an internal flag, and disconnects. It never fires again. The image is now ready to load.
+
+:::info
+Set `lazy={false}` to skip this step entirely. Useful for hero images or anything visible on page load.
+:::
+
+### 2. Format Negotiation
+
+Once the image is in view, the component checks what the browser supports. It loads two tiny test images, one AVIF, one WebP, and records the results. After the first visit, this result is cached in `localStorage` so the check never runs again.
+
+With browser support known, it picks the best available source:
+
+**AVIF**, **WebP**, **src** (JPEG/PNG)
+
+In CDN mode, the winning format is appended as a query parameter to `autoSrc`. In manual mode, it picks between `avifSrc`, `webpSrc`, and `src` directly.
+
+### 3. Preload
+
+The component creates an invisible `Image()` element in memory and points it at the resolved URL. The browser downloads the image silently in the background. No flicker, no layout shift.
+
+Loading moves through three states: `idle`, `loading`, `loaded` (or `error`).
+
+### 4. Render
+
+Three visual layers are stacked on top of each other:
+
+| Layer | When it shows |
+| --- | --- |
+| **Placeholder** | Immediately, while the full image loads |
+| **Real image** | Fades in once loading completes |
+| **Fallback** | Only when loading fails |
+
+The transition between placeholder and real image is a CSS opacity crossfade, no re-render, no layout recalculation, just a smooth visual handoff.
+
+---
+
+## Why This Approach
+
+**Nothing loads until it needs to.** The observer, the format check, and the network request all happen only when the image is about to be seen. Pages with dozens of images stay fast because off-screen images are completely idle.
+
+**Format detection runs once.** Probing for AVIF and WebP support has a cost. Caching the result in localStorage means that cost is paid exactly once per browser, not once per image or once per page load.
+
+**Layers, not swaps.** Placeholder, image, and fallback are always in the DOM. Switching between them is a CSS change, not a component remount. This keeps rendering smooth and predictable.

@@ -1,0 +1,77 @@
+---
+id: auto-format-config
+title: AutoFormatConfig
+sidebar_label: AutoFormatConfig
+sidebar_position: 3
+---
+
+# AutoFormatConfig
+
+The `AutoFormatConfig` interface defines how `react-pro-image` communicates format preferences to your CDN. When you use the `autoSrc` prop on `OptimizedImage`, the component uses this configuration to append the correct query parameter for format negotiation.
+
+## Interface Definition
+
+```ts
+interface AutoFormatConfig {
+  formatKey: string;
+  formats: ("avif" | "webp")[];
+}
+```
+
+## Properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `formatKey` | `string` | The query parameter key your CDN uses to accept format requests. For example, Unsplash and Imgix use `"fm"`, while Cloudinary uses `"f"`. |
+| `formats` | `("avif" \| "webp")[]` | An ordered list of modern formats to attempt, from most preferred to least preferred. The component tests browser support in this order and uses the first supported format. |
+
+## How It Works
+
+When the component resolves the final image URL, it performs the following steps:
+
+1. Iterates through the `formats` array in order.
+2. For each format, checks whether the browser supports it (using cached detection results from `useImageFormatSupport`).
+3. Appends the first supported format as a query parameter using the `formatKey`. For example, if `formatKey` is `"fm"` and the browser supports AVIF, the URL becomes `...&fm=avif`.
+4. If no modern format is supported, the original URL is used without modification, serving the default format (typically JPEG or PNG).
+
+:::info
+Format detection results are cached in `localStorage` after the first check. Subsequent page loads skip the detection step entirely, making format negotiation effectively instant.
+:::
+
+## CDN Compatibility
+
+Different CDNs use different query parameter keys. The table below lists common configurations:
+
+| CDN | `formatKey` | Resulting URL Fragment |
+| --- | --- | --- |
+| Unsplash / Imgix | `"fm"` | `...?fm=avif` |
+| Cloudinary | `"f"` | `...&f=webp` |
+| Custom / Self-hosted | `"format"` | `...?format=avif` |
+
+## Usage Example
+
+```tsx
+import { OptimizedImage } from "react-pro-image";
+
+// Unsplash / Imgix
+<OptimizedImage
+  autoSrc="https://images.unsplash.com/photo-example?w=800"
+  autoFormat={{ formatKey: "fm", formats: ["avif", "webp"] }}
+  alt="Landscape photograph"
+  width={800}
+  height={600}
+/>
+
+// Cloudinary
+<OptimizedImage
+  autoSrc="https://res.cloudinary.com/demo/image/upload/sample.jpg"
+  autoFormat={{ formatKey: "f", formats: ["avif", "webp"] }}
+  alt="Sample image from Cloudinary"
+  width={800}
+  height={600}
+/>
+```
+
+:::warning
+Ensure your CDN actually supports the formats listed in the `formats` array. If you request a format the CDN does not recognize, it may return an error or the original unoptimized image.
+:::

@@ -1,0 +1,2 @@
+# The documentation site is tracked in git but excluded from npm packages.
+docs/

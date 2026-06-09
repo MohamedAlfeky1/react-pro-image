@@ -1,0 +1,48 @@
+---
+id: browser-support
+title: Browser Support
+sidebar_label: Browser Support
+sidebar_position: 3
+---
+
+# Browser Support
+
+`react-pro-image` is designed to work across all modern browsers. Its core features degrade gracefully in older environments, ensuring that every user receives a functional image regardless of their browser's capabilities.
+
+## Compatibility Table
+
+| Feature | Requirement | Notes |
+| --- | --- | --- |
+| **Lazy Loading** | `IntersectionObserver` API | Supported in all modern browsers. Chrome 51+, Firefox 55+, Safari 12.1+, Edge 15+. |
+| **AVIF** | Browser-level AVIF decoding | Chrome 85+, Firefox 93+, Safari 16.4+. |
+| **WebP** | Browser-level WebP decoding | Chrome 32+, Firefox 65+, Safari 14+. |
+| **Fallback** | None (always available) | When neither AVIF nor WebP is supported, the component serves the standard `src` (JPEG/PNG). |
+
+## Graceful Degradation
+
+The component is built on the principle that no browser should display a broken image. The degradation path works as follows:
+
+1. **Modern browser (AVIF support)**: The user receives the smallest possible file. AVIF typically achieves 30-50% smaller file sizes compared to WebP and 50-80% smaller than JPEG at equivalent visual quality.
+
+2. **Capable browser (WebP support, no AVIF)**: The component falls back to WebP, which still provides significant size savings over JPEG and PNG.
+
+3. **Legacy browser (no modern format support)**: The standard `src` image is served. The user sees the same image with no visual degradation, just a larger file size.
+
+4. **Load failure**: If the selected source fails to load (network error, missing file, or server error), the fallback image activates automatically. If no fallback is provided, the `alt` text is displayed as the final safety net.
+
+:::info
+Format detection is performed once per browser and cached in `localStorage`. If a user updates their browser to a version that supports a new format, clearing `localStorage` or using an incognito session will trigger re-detection.
+:::
+
+---
+
+## IntersectionObserver Considerations
+
+The `IntersectionObserver` API is the foundation of the lazy loading behavior. It is supported in all major browsers released after 2017. For the rare cases where it is unavailable:
+
+- The component will still render correctly, but **all images will load immediately** rather than being deferred.
+- This is functionally equivalent to setting `lazy={false}` on every instance.
+
+:::warning
+If you need to support Internet Explorer 11 or other legacy browsers without `IntersectionObserver`, consider adding a polyfill such as `intersection-observer` from npm. The component will use it automatically once the global API is available.
+:::

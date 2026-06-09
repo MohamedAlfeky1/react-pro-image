@@ -1,0 +1,52 @@
+---
+id: installation
+title: Installation
+sidebar_label: Installation
+sidebar_position: 1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Installation
+
+Add `react-pro-image` to your project with a single command. The package provides dual ESM and CJS builds, so it integrates seamlessly into any modern React toolchain: Vite, Next.js, Create React App, or a custom webpack configuration.
+
+## Install the Package
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+    ```bash
+    npm install react-pro-image
+    ```
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+    ```bash
+    yarn add react-pro-image
+    ```
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+    ```bash
+    pnpm add react-pro-image
+    ```
+  </TabItem>
+</Tabs>
+
+---
+
+## What You Get
+
+After installation, your project gains access to:
+
+| Export | Purpose |
+| --- | --- |
+| `OptimizedImage` | The primary component. Handles lazy loading, format negotiation, placeholder crossfade, and error fallback in a single element. |
+| `useImageFormatSupport` | A hook that detects AVIF and WebP browser support with cached results. |
+| `useImageLoader` | A hook that preloads an image off-screen and reports its loading state. |
+| `useInView` | A hook that tracks whether a DOM element has entered the viewport. |
+
+All exports are fully typed. TypeScript users receive autocomplete and compile-time validation out of the box.
+
+## Next Steps
+
+Proceed to the [Quick Start](/getting-started/quick-start) guide to render your first optimized image in under a minute.
