@@ -1,0 +1,88 @@
+---
+id: error-fallbacks
+title: Error Fallbacks
+sidebar_label: Error Fallbacks
+description: Learn how to use fallback images in react-pro-image to gracefully handle image loading failures and protect the user experience.
+---
+
+# Error Fallbacks
+
+Even with the best optimization strategies, network hiccups, deleted assets, or ad-blockers can cause images to fail to load. Error fallbacks ensure your users never see a broken image icon, preserving the polish and stability of your UI.
+
+## What Are Error Fallbacks?
+
+The `fallback` prop acts as an automatic safety net. When `OptimizedImage` detects that the primary image source has failed to load (either due to a 404, network error, or invalid format), it immediately intercepts the error state and renders a designated fallback image in its place. 
+
+## UX Benefits: Why You Should Use Fallbacks
+
+As a best practice in UI design, visual stability and graceful degradation are key to user trust. Here's why implementing fallbacks matters:
+
+1. **Eliminates "Broken Image" Icons**: Default browser broken image icons look unprofessional and break the visual immersion of your app.
+2. **Preserves Layout Stability**: By providing a fallback image with the same dimensions or using the component's `width` and `height` props, you prevent layout shifts (CLS) when an image fails.
+3. **Maintains Brand Consistency**: You can provide a branded placeholder or a generic relevant icon (like a default user avatar) to keep the experience seamless.
+4. **Graceful Error Handling**: It fails silently and elegantly from the user's perspective, without requiring complex `onError` logic in your implementation.
+
+---
+
+## How to Use Fallback Props
+
+The `OptimizedImage` component provides granular control over fallback assets, supporting both static standard images and modern formats!
+
+### Available Props
+
+*   **`fallback`**: The standard fallback image source (e.g., a `.jpg` or `.png`).
+*   **`autoFallback`**: Useful if you are using an automatic image optimization service URL for your fallback.
+*   **`avifFallback`**: An AVIF version of your fallback for modern browsers.
+*   **`webpFallback`**: A WebP version of your fallback.
+
+### Basic Example
+
+Here is a straightforward example using a simple fallback image. If `profile-pic.jpg` fails to load, `default-avatar.png` seamlessly takes its place.
+
+```tsx
+import { OptimizedImage } from 'react-pro-image';
+
+function UserProfile() {
+  return (
+    <OptimizedImage
+      src="/images/profile-pic.jpg"
+      fallback="/images/default-avatar.png"
+      alt="User Profile"
+      width={100}
+      height={100}
+    />
+  );
+}
+```
+
+### Advanced Example with Modern Formats
+
+For maximum performance, you can supply modern formats even for your fallback images. If the primary image fails, the component will attempt to serve the best-supported fallback format!
+
+```tsx
+import { OptimizedImage } from 'react-pro-image';
+
+function ProductCard() {
+  return (
+    <OptimizedImage
+      // Primary sources
+      avifSrc="/images/product-1.avif"
+      webpSrc="/images/product-1.webp"
+      src="/images/product-1.jpg"
+      
+      // Fallback sources
+      avifFallback="/images/default-product.avif"
+      webpFallback="/images/default-product.webp"
+      fallback="/images/default-product.jpg"
+      
+      alt="Product Image"
+      width={400}
+      height={300}
+    />
+  );
+}
+```
+
+:::tip
+Keep fallback images lightweight and highly compressed. SVGs, low-resolution images, and small branded placeholders load quickly when recovery matters most.
+:::

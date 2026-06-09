@@ -1,0 +1,142 @@
+---
+id: hooks
+title: Hooks
+sidebar_label: Hooks
+sidebar_position: 4
+---
+
+# Hooks
+
+`react-pro-image` exports three composable hooks that power the `OptimizedImage` component internally. You can use these hooks independently to build custom image components or integrate image optimization logic into your own abstractions.
+
+```tsx
+import {
+  useImageFormatSupport,
+  useImageLoader,
+  useInView,
+} from "react-pro-image";
+```
+
+---
+
+## useImageFormatSupport
+
+Detects whether the current browser supports AVIF and WebP image formats. The hook works by loading a tiny, single-pixel test image for each format and observing whether the decode succeeds or fails. Results are cached in `localStorage`, so the detection overhead applies only on the very first page load.
+
+### Usage
+
+```tsx
+import { useImageFormatSupport } from "react-pro-image";
+
+function MyComponent() {
+  const { avif, webp, ready } = useImageFormatSupport();
+
+  if (!ready) return <p>Checking format support...</p>;
+
+  return (
+    <img
+      src={avif ? "/photo.avif" : webp ? "/photo.webp" : "/photo.jpg"}
+      alt="example"
+    />
+  );
+}
+```
+
+### Return Value
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `avif` | `boolean` | `true` if the browser can decode AVIF images. |
+| `webp` | `boolean` | `true` if the browser can decode WebP images. |
+| `ready` | `boolean` | `true` once detection is complete. Until this is `true`, `avif` and `webp` values are not yet reliable. |
+
+:::info
+Because results are cached in `localStorage`, clearing browser storage will cause the detection to run again on the next page load. This is by design, it allows the hook to pick up browser updates that add new format support.
+:::
+
+---
+
+## useImageLoader
+
+Preloads an image off-screen and tracks its loading state. The hook defers all network activity until the `isInView` flag is set to `true`, which makes it the core mechanism behind lazy loading in `OptimizedImage`.
+
+### Usage
+
+```tsx
+import { useImageLoader } from "react-pro-image";
+
+function MyComponent() {
+  const state = useImageLoader({
+    src: "/photo.jpg",
+    avifSrc: "/photo.avif",
+    isInView: true,
+  });
+  // state: "idle" -> "loading" -> "loaded" | "error"
+}
+```
+
+### Options
+
+The hook accepts a single options object of type `UseImageLoaderOptions`:
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` | `string` | None | Baseline image source URL. Used as the fallback if no modern format is supported. |
+| `autoSrc` | `string` | None | CDN image URL for auto-format mode. Mutually exclusive with `src`. |
+| `autoFormat` | `AutoFormatConfig` | None | Format negotiation configuration. Required when using `autoSrc`. |
+| `avifSrc` | `string` | None | Optional AVIF source. Takes highest priority when the browser supports AVIF. |
+| `webpSrc` | `string` | None | Optional WebP source. Used when the browser supports WebP but not AVIF. |
+| `isInView` | `boolean` | `false` | Controls when the preload begins. Set to `true` to trigger the image fetch. |
+
+### Return Value
+
+The hook returns a single value of type `ImageLoadState`:
+
+| State | Description |
+| --- | --- |
+| `"idle"` | The hook is waiting. Either `isInView` is `false` or format detection is still in progress. |
+| `"loading"` | The image fetch has started. An off-screen `Image()` element is downloading the asset. |
+| `"loaded"` | The image downloaded successfully and is ready to render. |
+| `"error"` | The image failed to load. The component should display a fallback. |
+
+---
+
+## useInView
+
+Tracks whether a DOM element has entered the viewport using the `IntersectionObserver` API. The observer operates in **one-shot mode**: it disconnects automatically after the first intersection, which means it does not fire repeatedly as the user scrolls.
+
+This behavior is intentional. Once an image has been triggered for loading, there is no need to continue observing it.
+
+### Usage
+
+```tsx
+import { useInView } from "react-pro-image";
+
+function MyComponent() {
+  const { ref, isInView } = useInView({ threshold: 0.25 });
+
+  return (
+    <div ref={ref}>{isInView && <img src="/photo.jpg" alt="example" />}</div>
+  );
+}
+```
+
+### Options
+
+The hook accepts an optional configuration object of type `UseInViewOptions`:
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `threshold` | `number` | `0.25` | Visibility ratio (0 to 1) required to trigger the intersection callback. A value of `0.25` means the callback fires when 25% of the element is visible. |
+| `rootMargin` | `string` | `"0px"` | CSS-style margin that expands or contracts the observation boundary. Use positive values like `"200px"` to start observing before the element scrolls into the visible viewport. |
+
+### Return Value
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `ref` | `RefObject<HTMLDivElement>` | A React ref to attach to the target DOM element you want to observe. |
+| `isInView` | `boolean` | `true` once the element meets the visibility threshold. Remains `true` permanently after the first trigger. |
+
+:::info
+The `useInView` hook is useful beyond image loading. You can use it to trigger animations, analytics events, or any logic that should execute when an element becomes visible for the first time.
+:::

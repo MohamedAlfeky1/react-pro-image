@@ -1,0 +1,82 @@
+---
+id: overview
+title: Overview
+sidebar_label: Overview
+slug: /
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# react-pro-image
+
+**A single React component for production-grade image optimization. Lazy loading, modern format negotiation, placeholder crossfade, and error fallback, configured in one line.**
+
+:::info
+`react-pro-image` ships with zero runtime dependencies beyond React itself. It
+is fully tree-shakeable, TypeScript-first, and works with any CDN or
+self-hosted image pipeline.
+:::
+
+## Why react-pro-image
+
+Serving unoptimized images is a primary cause of slow load times and poor user retention. While modern browsers support advanced compression formats like AVIF and WebP, manually implementing responsive images, lazy loading, and blur placeholders for every asset is tedious and error-prone.
+
+`react-pro-image` automates this entire pipeline in a single `<OptimizedImage />` component, delivering dramatic, production-proven performance gains:
+
+<div className="performance-comparison" style={{ margin: '2rem 0', textAlign: 'center' }}>
+  <img 
+    src="/img/before-after-package.webp" 
+    alt="Before and After Performance Comparison with react-pro-image" 
+    style={{ width: '100%', maxWidth: '800px' }} 
+  />
+</div>
+
+#### Bandwidth & Data Reduction
+* **Transferred Image Data:** Slashed from **1,690 kB to 267 kB** — an **84.2% reduction** in initial data transfer. Images are **over 6x smaller** over the wire.
+* **Memory Footprint:** Uncompressed resource size dropped from **1,677 kB to 254 kB** (an **84.8% decrease**), keeping browser memory lightweight.
+* **Total Page Weight:** Saved **1,423 kB** of total network data, cutting the overall page weight by **47.5%** (from **2,993 kB to 1,570 kB**).
+
+#### Loading Efficiency & UX Speed
+* **Total Finish Time:** Fully loading all resources dropped from **72 seconds (1.2 min) to 42.12 seconds** — achieving a **41.5% faster completion time**.
+* **Zero Main-Thread Blocking:** DOMContentLoaded and initial load times remain stable and lightweight, ensuring that image loading never blocks core page interactivity.
+
+<div style={{
+  padding: '1.25rem 1.5rem',
+  backgroundColor: 'rgba(16, 185, 129, 0.08)',
+  borderLeft: '4px solid #10b981',
+  borderRadius: '8px',
+  margin: '1.5rem 0',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+}}>
+  <strong style={{ display: 'block', margin: '0 0 0.5rem 0', color: '#10b981', fontSize: '1rem' }}>Summary of Total Impact</strong>
+  <span style={{ display: 'block', fontSize: '0.95rem', lineHeight: '1.6' }}>By delaying the loading of off-screen images and serving optimized structures, the package cuts image-related data overhead by <strong>84%</strong> and accelerates overall network completion times by <strong>41.5%</strong>, significantly lowering data costs for users and improving retention.</span>
+</div>
+
+---
+
+## Feature Overview
+
+| Feature | Description |
+| --- | --- |
+| **Lazy Loading** | Images load only when they enter the viewport via `IntersectionObserver`, eliminating layout shift and reducing wasted bandwidth. |
+| **AVIF / WebP Negotiation** | Automatically detects browser support and serves the smallest modern format. Detection results are cached in `localStorage`. |
+| **Placeholder Crossfade** | Displays a low-resolution or blurred placeholder that smoothly transitions out once the full image finishes loading. |
+| **Error Fallback** | Gracefully renders a fallback image if the primary source fails, preventing broken image icons. |
+| **CDN Auto-Format** | Works out of the box with Unsplash, Imgix, Cloudinary, and any CDN that accepts a format query parameter. |
+| **Tree-Shakeable** | Dual ESM and CJS builds let your bundler import only the code you use. |
+| **Fully Typed** | Written in TypeScript with strict, exported types for every prop, hook, and configuration object. |
+| **Zero Dependencies** | Only `react` (version 17 or later) is required as a peer dependency. |
+
+## Quick Links
+
+- [Installation](/getting-started/installation)
+- [Quick Start](/getting-started/quick-start)
+- [API Reference](/api-reference/props-reference)
+- [Loading & Reliability](/loading-reliability/lazy-loading)
+
+---
+
+## License
+
+MIT, [MohamedAlfeky1](https://github.com/MohamedAlfeky1)

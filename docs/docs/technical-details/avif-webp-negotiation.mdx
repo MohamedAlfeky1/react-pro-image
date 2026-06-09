@@ -1,0 +1,182 @@
+---
+id: avif-webp-negotiation
+title: AVIF & WebP Negotiation
+sidebar_label: AVIF & WebP Negotiation
+description: Learn how react-pro-image detects browser image-format support and chooses AVIF, WebP, or a fallback source.
+sidebar_position: 2
+---
+
+# AVIF & WebP Negotiation
+
+`react-pro-image` chooses the best image format each visitor can actually use. When AVIF is supported, it loads AVIF. When AVIF is not available but WebP is, it loads WebP. When neither modern format works, it falls back to the original image source.
+
+That gives you modern image delivery without writing a custom `<picture>` element for every image.
+
+## The Decision Order
+
+The component follows one simple priority order:
+
+```txt
+AVIF -> WebP -> original source
+```
+
+This order is used in both source modes:
+
+| Mode | What you provide | What the component chooses |
+| --- | --- | --- |
+| **CDN images** | One base URL plus `autoFormat` | A format query such as `?f=avif` or `?fm=webp` |
+| **Self-hosted images** | Separate `avifSrc`, `webpSrc`, and `src` files | The best file the browser supports |
+
+The component does not convert images by itself. It either asks your CDN for a specific format or selects from the format files you already generated.
+
+## How Detection Works
+
+`useImageFormatSupport()` checks whether the browser can decode AVIF and WebP by loading tiny test images in memory. The result is cached in `localStorage`, so the browser pays that detection cost once instead of repeating it for every image.
+
+The hook returns:
+
+```ts
+{
+  avif: boolean;
+  webp: boolean;
+  ready: boolean;
+}
+```
+
+`ready` is important because format detection is asynchronous. `<OptimizedImage />` waits until support is known before it commits to the final image URL.
+
+---
+
+## CDN Mode
+
+Use CDN mode when your image service can return AVIF or WebP from the same base URL.
+
+```tsx
+import { OptimizedImage } from "react-pro-image";
+
+export function HeroImage() {
+  return (
+    <OptimizedImage
+      autoSrc="https://res.cloudinary.com/demo/image/upload/sample.jpg"
+      autoFormat={{ formatKey: "f", formats: ["avif", "webp"] }}
+      autoPlaceholder="https://res.cloudinary.com/demo/image/upload/w_32,e_blur:300/sample.jpg"
+      alt="Sample product image"
+      width={1200}
+      height={675}
+      lazy={false}
+    />
+  );
+}
+```
+
+If AVIF is supported, the final image request includes:
+
+```txt
+?f=avif
+```
+
+If only WebP is supported, it uses:
+
+```txt
+?f=webp
+```
+
+If neither format is supported, the original `autoSrc` is used unchanged.
+
+:::tip
+Use CDN mode when your provider can transform images dynamically, such as Cloudinary, Contentful, Imgix, or a custom image service.
+:::
+
+## Self-Hosted Mode
+
+Use self-hosted mode when you already have separate image files for each format.
+
+```tsx
+import { OptimizedImage } from "react-pro-image";
+
+export function ProductImage() {
+  return (
+    <OptimizedImage
+      src="/images/shoe.jpg"
+      avifSrc="/images/shoe.avif"
+      webpSrc="/images/shoe.webp"
+      placeholder="/images/shoe-preview.jpg"
+      fallback="/images/shoe-fallback.jpg"
+      alt="Black running shoe"
+      width={800}
+      height={600}
+    />
+  );
+}
+```
+
+In this mode:
+
+- `avifSrc` is used when AVIF is supported.
+- `webpSrc` is used when AVIF is unavailable and WebP is supported.
+- `src` is always the final fallback.
+
+You only need to provide the formats you actually have. If you only generated WebP and JPEG files, pass `webpSrc` and `src`.
+
+---
+
+## Query Parameter Handling
+
+When you use `autoSrc`, the component preserves existing CDN parameters and appends the negotiated format parameter correctly.
+
+| Base URL | Final AVIF URL |
+| --- | --- |
+| `/photo` | `/photo?fm=avif` |
+| `/photo?w=800` | `/photo?w=800&fm=avif` |
+
+This lets you keep width, quality, crop, blur, and other CDN settings while adding the best supported output format.
+
+## How It Works With Loading
+
+Format negotiation happens before the final image is preloaded. By default, this is also gated by lazy loading:
+
+1. The image waits until it approaches the viewport.
+2. The component checks cached AVIF/WebP support.
+3. The best URL is resolved.
+4. `useImageLoader()` preloads that URL off-screen.
+5. The placeholder crossfades into the loaded image.
+
+For above-the-fold images, set `lazy={false}` so the browser can start loading the optimized source immediately.
+
+## Fallback Behavior
+
+If the selected modern format fails to load, the component can still recover through your fallback props:
+
+```tsx
+<OptimizedImage
+  src="/images/product.jpg"
+  avifSrc="/images/product.avif"
+  webpSrc="/images/product.webp"
+  fallback="/images/product-fallback.jpg"
+  avifFallback="/images/product-fallback.avif"
+  webpFallback="/images/product-fallback.webp"
+  alt="Product preview"
+  width={900}
+  height={600}
+/>
+```
+
+For CDN mode, `autoFallback` uses the same `autoFormat` configuration as `autoSrc`, so fallback images can also be requested as AVIF or WebP when supported.
+
+---
+
+## Best Practices
+
+- Use `["avif", "webp"]` as the default format order.
+- Only include formats your CDN or asset pipeline can actually serve.
+- Always provide `src` or `autoSrc` as the original fallback.
+- Provide `width` and `height` to prevent layout shift.
+- Use `lazy={false}` only for important above-the-fold images.
+- Add a lightweight placeholder for large images and image-heavy pages.
+
+## Related Guides
+
+- [CDN Images](/usage-modes/cdn-images)
+- [Self-Hosted Images](/usage-modes/self-hosted-images)
+- [Progressive Loading](/loading-reliability/progressive-loading)
+- [Browser Support](/technical-details/browser-support)

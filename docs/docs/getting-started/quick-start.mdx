@@ -1,0 +1,111 @@
+---
+id: quick-start
+title: Quick Start
+sidebar_label: Quick Start
+sidebar_position: 2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Quick Start
+
+Get up and running in minutes. No complex setup, no manual configuration, just drop in the component and let it handle the rest.
+
+<div className="steps">
+<div className="step-item">
+
+### Install the Package
+
+Add `react-pro-image` to your project using your preferred package manager:
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+    ```bash
+    npm install react-pro-image
+    ```
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+    ```bash
+    yarn add react-pro-image
+    ```
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+    ```bash
+    pnpm add react-pro-image
+    ```
+  </TabItem>
+</Tabs>
+
+</div>
+<div className="step-item">
+
+### Import the Component
+
+Start by importing `OptimizedImage` from the package:
+
+```tsx
+import { OptimizedImage } from "react-pro-image";
+```
+
+</div>
+<div className="step-item">
+
+### Render an Optimized Image
+
+Pass your CDN image URL along with format and placeholder configuration:
+
+```tsx
+function Hero() {
+  return (
+    <OptimizedImage
+      autoSrc="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"
+      autoFormat={{ formatKey: "fm", formats: ["avif", "webp"] }}
+      autoPlaceholder="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=20&blur=10"
+      alt="Sunlit mountain valley with golden light"
+      width={800}
+      height={400}
+    />
+  );
+}
+```
+
+</div>
+</div>
+
+---
+
+## Understand the Props
+
+Each prop controls a specific part of the optimization pipeline.
+
+**`autoSrc`**
+The primary CDN image URL. The component appends the appropriate format parameter, for example, `&fm=avif`, based on what the visitor's browser supports.
+
+**`autoFormat`**
+Tells the component which query key your CDN uses for format selection and the preferred format order. Unsplash and Imgix use `fm`; Cloudinary uses `f`.
+
+**`autoPlaceholder`**
+A URL pointing to a tiny, low-resolution version of the image. It renders immediately and crossfades out once the full-resolution image finishes loading.
+
+**`alt`**
+Descriptive text for the image. Critical for screen readers and search engine indexing. Always provide a meaningful value.
+
+**`width` / `height`**
+The dimensions of the image container in pixels. Setting these prevents layout shift (CLS) during loading.
+
+---
+
+## What Happens Under the Hood
+
+When the component mounts, it follows this sequence:
+
+1. **Viewport detection**: The `useInView` hook monitors the container with an `IntersectionObserver`. No network requests are made until the image enters the viewport.
+2. **Format negotiation**: The `useImageFormatSupport` hook probes for AVIF and WebP support by loading a tiny test image. Results are cached in `localStorage`, so detection runs only once per browser.
+3. **Image preload**: The `useImageLoader` hook creates an off-screen `Image()` element to fetch the best available format. The component transitions from `idle` to `loading` to `loaded` (or `error`).
+4. **Crossfade render**: The placeholder layer fades to transparent as the full image appears. If loading fails, the fallback layer activates automatically.
+
+## Next Steps
+
+- To host images yourself instead of using a CDN, see the [Self-Hosted Images](/usage-modes/self-hosted-images) guide.
+- For a complete list of every prop, visit the [Props Reference](/api-reference/props-reference).

@@ -1,0 +1,118 @@
+---
+id: props-reference
+title: Props Reference
+sidebar_label: Props Reference
+sidebar_position: 2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Props Reference
+
+Every prop accepted by `<OptimizedImage />`, grouped by what they do and which mode they belong to.
+
+:::info
+All standard HTML `div` attributes (`id`, `style`, `className`, `onMouseEnter`, etc.) are forwarded to the outer wrapper automatically.
+:::
+
+---
+
+## Shared Props
+
+These props work in both CDN and Manual mode. They control layout, accessibility, and loading behavior.
+
+**`alt`** `string`
+A text description of the image for screen readers and search engines. Always provide a meaningful value.
+
+**`width`** `number`
+Width of the image container in pixels. Helps the browser reserve space before the image loads, preventing layout shift.
+
+**`height`** `number`
+Height of the image container in pixels.
+
+**`className`** `string`
+One or more CSS classes applied to the outermost wrapper `div`. Works with Tailwind, CSS Modules, or plain CSS.
+
+**`lazy`** `boolean`, default: `true`
+When `true`, the image is not fetched until it scrolls into the viewport. Set to `false` for images visible immediately on page load, like hero banners.
+
+:::warning
+Always set `lazy={false}` for above-the-fold images. This ensures they load right away and improves your Largest Contentful Paint (LCP) score.
+:::
+
+**`threshold`** `number`, default: `0.25`
+How much of the image must be visible before loading starts. `0.25` means 25% of the image must be in the viewport. Accepts any value between `0` and `1`.
+
+**`rootMargin`** `string`, default: `"0px"`
+A CSS margin string that expands or shrinks the detection zone around the viewport. Use `"200px"` to start loading 200px before the image scrolls into view.
+
+---
+
+## CDN Props
+
+Use these props when your images are served by a CDN (Unsplash, Imgix, Cloudinary, etc.). The component appends format query parameters automatically based on what the browser supports.
+
+See the [CDN Images](/usage-modes/cdn-images) guide for a full walkthrough.
+
+**`autoSrc`** `string`, required in CDN mode
+The base URL of your image on the CDN. The component appends the best supported format query automatically, for example `?fm=avif`.
+
+**`autoFormat`** `object`, required when using `autoSrc`
+Tells the component which query key your CDN uses and which formats to try. Two fields:
+
+- `formatKey`: the parameter name your CDN expects (e.g. `"fm"` for Unsplash, `"f"` for Cloudinary)
+- `formats`: an ordered list of formats to try, most preferred first (e.g. `["avif", "webp"]`)
+
+<Tabs>
+  <TabItem value="unsplash" label="Unsplash / Imgix" default>
+    ```tsx
+    autoFormat={{ formatKey: "fm", formats: ["avif", "webp"] }}
+    ```
+  </TabItem>
+  <TabItem value="cloudinary" label="Cloudinary">
+    ```tsx
+    autoFormat={{ formatKey: "f", formats: ["avif", "webp"] }}
+    ```
+  </TabItem>
+  <TabItem value="custom" label="Custom">
+    ```tsx
+    autoFormat={{ formatKey: "format", formats: ["avif", "webp"] }}
+    ```
+  </TabItem>
+</Tabs>
+
+**`autoPlaceholder`** `string`
+A CDN URL for a tiny preview image shown while the full image loads. Usually the same base URL with a very small size and blur applied. Fades out once the full image is ready.
+
+**`autoFallback`** `string`
+A CDN base URL shown if the primary image fails to load. The component appends the format parameter the same way it does for `autoSrc`.
+
+---
+
+## Manual Props
+
+Use these props when your images are self-hosted, stored in your `public` folder, an S3 bucket, or any static file server. You provide each format variant yourself, and the component picks the best one the browser supports.
+
+See the [Self-Hosted Images](/usage-modes/self-hosted-images) guide for a full walkthrough.
+
+**`src`** `string`, required in manual mode
+Path to your base image file (JPEG, PNG, etc.). Always used as the final fallback when no modern format is available.
+
+**`avifSrc`** `string`
+Path to a pre-generated AVIF version. Used first when the browser supports AVIF, typically 30-50% smaller than JPEG at the same quality.
+
+**`webpSrc`** `string`
+Path to a pre-generated WebP version. Used when the browser supports WebP but not AVIF.
+
+**`placeholder`** `string`
+Path to a small, low-resolution preview image shown while the full image loads. Fades out automatically once loading is complete.
+
+**`fallback`** `string`
+A backup image path shown if the primary source fails to load. Prevents a broken image icon from appearing.
+
+**`avifFallback`** `string`
+An AVIF version of the fallback image, used when the browser supports AVIF.
+
+**`webpFallback`** `string`
+A WebP version of the fallback image, used when the browser supports WebP but not AVIF.

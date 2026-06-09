@@ -1,0 +1,102 @@
+---
+id: lazy-loading
+title: Lazy Loading
+sidebar_label: Lazy Loading
+sidebar_position: 1
+---
+
+# Lazy Loading
+
+By default, every `OptimizedImage` instance is lazy-loaded. The component uses the `IntersectionObserver` API to monitor its container and defers all network requests until the image enters (or approaches) the viewport. This eliminates wasted bandwidth for images that the user may never scroll to.
+
+This page covers how to disable lazy loading for critical above-the-fold content and how to fine-tune the observation parameters for optimal perceived performance.
+
+## Disabling Lazy Loading
+
+Images at the very top of a page, hero banners, logos, or featured product shots, should load immediately. These elements are visible on the initial render, so deferring their load adds unnecessary delay.
+
+Set `lazy={false}` to bypass the `IntersectionObserver` entirely:
+
+```tsx
+import { OptimizedImage } from "react-pro-image";
+
+function HeroBanner() {
+  return (
+    <OptimizedImage
+      src="/hero.jpg"
+      alt="Above the fold hero banner"
+      lazy={false}
+      width={1920}
+      height={800}
+    />
+  );
+}
+```
+
+:::warning
+Only disable lazy loading for images that are genuinely above the fold. Disabling it for all images negates the bandwidth savings that lazy loading provides.
+:::
+
+---
+
+## Adjusting the Visibility Threshold
+
+The `threshold` prop controls what percentage of the image container must be visible before loading begins. The default value is `0.25` (25%).
+
+```tsx
+<OptimizedImage
+  src="/gallery-item.jpg"
+  alt="Gallery item"
+  threshold={0.1}
+  width={400}
+  height={300}
+/>
+```
+
+| Value | Behavior |
+| --- | --- |
+| `0` | Loading starts as soon as a single pixel of the container enters the viewport. |
+| `0.1` | Loading starts when 10% of the container is visible. |
+| `0.25` (default) | Loading starts when 25% of the container is visible. |
+| `1` | Loading starts only when the entire container is fully visible. |
+
+Lower values trigger loading earlier, which reduces the chance of the user seeing a placeholder. Higher values defer loading longer, which saves bandwidth for content that might only be partially scrolled into view.
+
+## Expanding the Observation Area
+
+The `rootMargin` prop adds a virtual margin around the viewport boundary. This causes the observer to trigger before the image actually reaches the visible area, giving the browser a head start on downloading the asset.
+
+```tsx
+<OptimizedImage
+  src="/gallery-item.jpg"
+  alt="Gallery item"
+  rootMargin="200px"
+  width={400}
+  height={300}
+/>
+```
+
+With `rootMargin="200px"`, the observer considers the image "in view" when it is within 200 pixels of the viewport edge. By the time the user scrolls to the image, it is already loaded and ready to display.
+
+:::info
+Combining a low `threshold` with a generous `rootMargin` provides the smoothest experience. For example, `threshold={0.1}` with `rootMargin="300px"` ensures images start loading well before they reach the screen, while still deferring images that are far away.
+:::
+
+---
+
+## Combining Both Options
+
+You can use `threshold` and `rootMargin` together for precise control:
+
+```tsx
+<OptimizedImage
+  src="/product.jpg"
+  alt="Product photo"
+  threshold={0.1}
+  rootMargin="200px"
+  width={400}
+  height={300}
+/>
+```
+
+This configuration starts loading when 10% of the container is within 200 pixels of the viewport, an aggressive preload strategy that virtually eliminates visible placeholder delays in fast-scrolling interfaces.
