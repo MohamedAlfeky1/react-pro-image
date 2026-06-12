@@ -1,6 +1,6 @@
 {
   "name": "react-pro-image",
-  "version": "1.1.2",
+  "version": "1.1.7",
   "type": "module",
   "description": "One single <OptimizedImage /> component, a few props, and you get lazy loading, AVIF/WebP auto-format, placeholder crossfade, and error fallback — out of the box.",
   "author": "MohamedAlfeky1",
@@ -46,6 +46,13 @@
     "LICENSE"
   ],
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -55,8 +62,8 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "react": ">=17.0.0",
-    "react-dom": ">=17.0.0"
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "react-dom": {
