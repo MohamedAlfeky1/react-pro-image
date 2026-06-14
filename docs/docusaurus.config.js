@@ -52,6 +52,10 @@ const config = {
             "https://github.com/MohamedAlfeky1/react-pro-image/tree/main/docs",
         },
         blog: false,
+        sitemap: {
+          changefreq: "weekly",
+          priority: 0.5,
+        },
         theme: {
           customCss: "./src/css/custom.css",
         },
